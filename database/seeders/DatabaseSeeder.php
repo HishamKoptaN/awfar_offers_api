@@ -12,16 +12,20 @@ class DatabaseSeeder extends Seeder
         $this->call(
             [
                 CountriesSeeder::class,
-                GovernoratesSeeder::class,
+                CitiesSeeder::class,
                 StoresSeeder::class,
                 CategoriesSeeder::class,
+                SubCategoriesSeeder::class,
+                MarkasSeeder::class,
+                OffersGroupsSeeder::class,
                 OffersSeeder::class,
-                // NotificationsSeeder::class,
-                // MessagesSeeder::class,
-                // SettingSeeder::class,
-                // ChatSeeder::class,
-                // PermissionsSeeder::class,
-                // RolesAndPermissionsSeeder::class,
+                CouponsSeeder::class,
+                NotificationsSeeder::class,
+                ProductsSeeder::class,
+                UsersSeeder::class,
+                PermissionsSeeder::class,
+                RolesSeeder::class,
+                RoleUserSeeder::class,
             ],
         );
     }

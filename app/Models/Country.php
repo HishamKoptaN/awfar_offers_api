@@ -12,5 +12,10 @@ class Country extends Model
     protected $fillable = [
         'name',
         'flag',
+        'status',
     ];
+    public function getStatusAttribute($value)
+    {
+        return (bool) $value;
+    }
 }

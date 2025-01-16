@@ -13,15 +13,25 @@ class ProfileDashController extends Controller
     {
         switch ($request->method()) {
             case 'GET':
-                return $this->getStatus($request);
+                return $this->getStatus(
+                    $request,
+                );
             case 'PATCH':
-                return $this->uploadFile($request);
+                return $this->uploadFile(
+                    $request,
+                );
             case 'POST':
-                return $this->uploadFile($request);
+                return $this->uploadFile(
+                    $request,
+                );
             case 'PUT':
-                return $this->updateStatus($request);
+                return $this->updateStatus(
+                    $request,
+                );
             case 'DELETE':
-                return $this->deleteFile($request);
+                return $this->deleteFile(
+                    $request,
+                );
             default:
                 return response()->json(['status' => false, 'message' => 'Invalid request method']);
         }

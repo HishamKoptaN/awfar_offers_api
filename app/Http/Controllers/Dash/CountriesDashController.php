@@ -6,47 +6,43 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Exception;
-use App\Traits\ApiResponseTrait;
 use App\Models\Country;
 
 class CountriesDashController extends Controller
 {
-    use ApiResponseTrait;
     public function handleRequest(Request $request, $id = null)
     {
         switch ($request->method()) {
             case 'GET':
                 return $this->get($request);
             case 'POST':
-                return $this->store($request);
+                return $this->post($request);
             case 'PUT':
-                return $this->update($request);
+                return $this->put($request);
             case 'DELETE':
                 return $this->delete($id);
             default:
-                return response()->json(
-                    [
-                        'status' => false,
-                        'message' => 'Invalid request method',
-                    ],
-                );
+                return failureResponse();
         }
     }
     public function get()
     {
         try {
             $countries = Country::all();
-            return $this->successResponse($countries);
+            return successResponse($countries);
         } catch (\Exception $e) {
-            return $this->failureResponse($e->getMessage());
+            return failureResponse($e->getMessage());
         }
     }
 
-    public function store(Request $request)
+    public function post(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'code' => 'required|string|max:3',
-        ]);
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'code' => 'required|string|max:3',
+            ],
+        );
         if ($validator->fails()) {
             return response()->json(
                 [
@@ -59,38 +55,53 @@ class CountriesDashController extends Controller
             $country = new Country();
             $country->code = $request->input('code');
             $country->save();
-            $countries = Country::all();
-            return response()->json(
-                $countries,
-                201,
+            return successResponse(
+                $country,
             );
         } catch (Exception $e) {
-            return response()->json(
-                [
-                    'error' => $e->getMessage(),
-                ],
-                500,
+            return failureResponse(
+                $e->getMessage(),
             );
         }
     }
-    public function updateCountry(Request $request)
+    public function put(Request $request)
     {
-        $countries = Country::all();
-        return response()->json(
-            $countries,
-        );
+        try {
+            $country = Country::find(
+                $request->id,
+            );
+            if (!$country) {
+                return failureResponse(
+                    'City not found',
+                );
+            }
+            $country->update(
+                [
+                    'code' => $request->code,
+
+                ],
+            );
+            return successResponse(
+                $country,
+            );
+        } catch (\Exception $e) {
+            return failureResponse(
+                $e->getMessage(),
+            );
+        }
     }
     public function delete($id)
     {
         try {
-            $country = Country::findOrFail($id);
+            $country = Country::findOrFail(
+                $id,
+            );
             $country->delete();
-            $countries = Country::all();
-            return $this->successResponse($countries, 200);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return $this->failureResponse("not found.", 404);
+            return successResponse();
         } catch (\Exception $e) {
-            return $this->failureResponse($e->getMessage(), 500);
+            return failureResponse(
+                $e->getMessage(),
+            );
         }
     }
 }

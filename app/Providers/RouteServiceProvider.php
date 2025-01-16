@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
-
     protected $namespace = 'App\Http\Controllers';
     public function boot()
     {
@@ -26,10 +25,23 @@ class RouteServiceProvider extends ServiceProvider
     }
     public function map()
     {
+        $this->mapArtisanRoutes();
         $this->mapAuthApiRoutes();
         $this->mapAppApiRoutes();
         $this->mapDashApiRoutes();
         $this->mapWebRoutes();
+    }
+    protected function mapArtisanRoutes()
+    {
+
+        Route::prefix('artisan')
+            ->middleware('api')
+            ->namespace($this->namespace)
+            ->group(
+                base_path(
+                    'routes/artisan.php',
+                ),
+            );
     }
     protected function mapAuthApiRoutes()
     {
@@ -75,64 +87,4 @@ class RouteServiceProvider extends ServiceProvider
                 ),
             );
     }
-
-    // protected function map()
-    // {
-    //     $this->mapAppApiRoutes();
-    //     $this->mapAdminApiRoutes();
-    // }
-    // protected function mapAppApiRoutes()
-    // {
-    //     Route::prefix('app')
-    //         ->middleware('app')
-    //         ->namespace($this->namespace)
-    //         ->group(
-    //             base_path('routes/app_api.php'),
-    //         );
-    // }
-    // protected function mapDashApiRoutes()
-    // {
-    //     Route::prefix('dash')
-    //         ->middleware('api')
-    //         ->namespace($this->namespace)
-    //         ->group(base_path('routes/dash_api.php'));
-    // }
-
-    // public function boot(): void
-    // {
-    //     RateLimiter::for(
-    //         'api',
-    //         function (Request $request) {
-    //             return Limit::perMinute(120)->by(
-    //                 $request->user()?->id ?: $request->ip(),
-    //             );
-    //         },
-    //     );
-
-    //     $this->routes(
-    //         function () {
-    //             Route::middleware('app_api')
-    //                 ->prefix('api')
-    //                 ->group(
-    //                     base_path(
-    //                         'routes/api.php',
-    //                     ),
-    //                 );
-    //             Route::middleware('api')
-    //                 ->prefix('api')
-    //                 ->group(
-    //                     base_path(
-    //                         'routes/api.php',
-    //                     ),
-    //                 );
-
-    //             Route::middleware('web')
-    //                 ->group(
-    //                     base_path(
-    //                         'routes/web.php',
-    //                     ),
-    //                 );
-    //         },
-    //     );
-    // }
 }

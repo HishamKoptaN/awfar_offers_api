@@ -11,6 +11,7 @@ class Setting extends Model
     use HasFactory;
 
     protected $fillable = [
+        "status",
         'name',
         'content'
     ];
@@ -18,4 +19,8 @@ class Setting extends Model
     protected $casts = [
         'content' => Serialize::class
     ];
+    public function getStatusAttribute($value)
+    {
+        return (bool) $value;
+    }
 }

@@ -17,43 +17,24 @@ class User extends Authenticatable implements JWTSubject
     protected $fillable = [
         'status',
         'online_offline',
-        'account_number',
-        'token',
-        'name',
-        'username',
+        'first_name',
+        'last_name',
         'password',
         'email',
         'image',
         'address',
         'phone',
-        'phone_verified_at',
-        'balance',
-        'phone_verification_code',
-        'inactivate_end_at',
-        'upgraded_at',
-        'comment',
-        'refcode',
-        'account_info',
-        'balance',
-        'confirmation_code',
-        'reset_code',
-        'refered_by',
-        'plan_id',
-        'role'
     ];
 
 
+    public function getStatusAttribute($value)
+    {
+        return (bool) $value;
+    }
     public function accounts()
     {
         return $this->hasMany(Account::class);
     }
-    public function role()
-    {
-        return $this->belongsTo(Role::class);
-    }
-
-
-
     public function createdDate(): Attribute
     {
         return Attribute::make(
@@ -73,10 +54,6 @@ class User extends Authenticatable implements JWTSubject
     public function referrals()
     {
         return $this->hasMany(User::class, 'refered_by');
-    }
-    public function userPlan()
-    {
-        return $this->hasOne(UserPlan::class);
     }
     public function getJWTIdentifier()
     {

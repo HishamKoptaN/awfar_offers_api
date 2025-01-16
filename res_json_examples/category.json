@@ -1,0 +1,36 @@
+{
+    "id": 1,
+    "name": "Category1",
+    "sub_categories": [
+        {
+            "id": 68,
+            "name": "SubCategory68",
+            "image": "https://api.awfar-offers.com/storage/sub_category.jpg",
+            "category_id": 1,
+            "markas": [
+                {
+                    "id": 61,
+                    "name": "marka 1",
+                    "sub_category_id": 68,
+                    "products_marka_count": 1
+                }
+            ],
+            "stores": [
+                {
+                    "id": 61,
+                    "name": "store 1",
+                    "sub_category_id": 68,
+                    "products_stores_count": 1
+                }
+            ],
+            "products": [
+                {
+                    "id": 61,
+                    "name": "store 1",
+                    "sub_category_id": 68,
+                    "products_stores_count": 1
+                }
+            ]
+        }
+    ]
+}

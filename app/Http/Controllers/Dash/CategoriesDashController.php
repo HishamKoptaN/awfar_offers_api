@@ -4,14 +4,10 @@ namespace App\Http\Controllers\Dash;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Traits\ApiResponseTrait;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 use App\Models\Category;
 
 class CategoriesDashController extends Controller
 {
-    use ApiResponseTrait;
     public function handleRequest(
         Request $request,
         $id = null,
@@ -25,8 +21,8 @@ class CategoriesDashController extends Controller
                 return $this->post(
                     $request,
                 );
-            case 'PUT':
-                return $this->put(
+            case 'PATCH':
+                return $this->patch(
                     $request,
                 );
             case 'DELETE':
@@ -34,40 +30,74 @@ class CategoriesDashController extends Controller
                     $id,
                 );
             default:
-                return response()->json(
-                    [
-                        'status' => false,
-                        'message' => 'Invalid request method',
-                    ],
-                );
+                return failureResponse();
         }
     }
-    public function get(Request $request)
-    {
+    public function get(
+        Request $request,
+    ) {
         try {
             $categories = Category::all();
-            return $this->successResponse(
+            return successResponse(
                 $categories,
             );
         } catch (\Exception $e) {
-            return $this->failureResponse(
+            return failureResponse(
                 $e->getMessage(),
             );
         }
     }
-    public function post(Request $request)
-    {
+    public function post(
+        Request $request,
+    ) {
         try {
-            Category::create(
+            $category = Category::create([
+                'name' => $request->name,
+            ]);
+            return successResponse(
+                $category,
+                201,
+            );
+        } catch (\Exception $e) {
+            return failureResponse($e->getMessage(), 500);
+        }
+    }
+    public function patch(
+        Request $request,
+    ) {
+        try {
+            $category = Category::find(
+                $request->id,
+            );
+            $category->update(
                 [
+                    'id' => $request->id,
                     'name' => $request->name,
                 ],
             );
-            return $this->successResponse([], 200);
+            return successResponse(
+                $category,
+            );
         } catch (\Exception $e) {
-            return $this->failureResponse($e->getMessage(), 500);
+            return failureResponse(
+                $e->getMessage(),
+            );
         }
     }
-    public function put(Request $request) {}
-    public function delete(Request $request) {}
+
+    public function delete(
+        $id,
+    ) {
+        try {
+            $category = Category::find(
+                $id,
+            );
+            $category->delete();
+            return successResponse();
+        } catch (\Exception $e) {
+            return failureResponse(
+                $e->getMessage(),
+            );
+        }
+    }
 }

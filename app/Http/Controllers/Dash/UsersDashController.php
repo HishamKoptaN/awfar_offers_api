@@ -12,67 +12,51 @@ use App\Models\Permission;
 
 class UsersDashController extends Controller
 {
-    public function handleUsers(Request $request)
-    {
+    public function handleRequest(
+        Request $request,
+    ) {
         switch ($request->method()) {
             case 'GET':
-                return $this->getAllUsers($request);
+                return $this->get(
+                    $request,
+                );
             case 'POST':
-                return $this->uploadFile($request);
+                return $this->uploadFile(
+                    $request,
+                );
             case 'PUT':
-                return $this->updateFile($request);
+                return $this->updateFile(
+                    $request,
+                );
             case 'PATCH':
-                return $this->updateUser($request);
+                return $this->updateUser(
+                    $request,
+                );
             case 'DELETE':
-                return $this->deleteFile($request);
+                return $this->deleteFile(
+                    $request,
+                );
             default:
                 return response()->json(['status' => false, 'message' => 'Invalid request method']);
         }
     }
-    protected function getAllUsers(Request $request)
+    protected function get(Request $request)
     {
         try {
             $users = User::all();
-            $usersWithPermissions = $users->map(function ($user) {
-                $user_permissions = DB::table('user_has_permissions')
-                    ->join('permissions', 'user_has_permissions.permission_id', '=', 'permissions.id')
-                    ->where('user_has_permissions.user_id', $user->id)
-                    ->select('permissions.name', 'user_has_permissions.permission_id')
-                    ->get();
-
-                return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'status' => $user->status,
-                    'balance' => $user->balance,
-                    'plan_id' => $user->plan_id,
-                    'phone' => $user->phone,
-                    'address' => $user->address,
-                    'comment' => $user->comment,
-                    'created_at' => $user->created_at,
-                    'updated_at' => $user->updated_at,
-                    'upgraded_at' => $user->updated_at,
-                    'inactivate_end_at' => $user->inactivate_end_at,
-                    'user_permissions' => $user_permissions,
-                ];
-            });
-            $permissions = Permission::all();
-            return response()->json([
-                'status' => true,
-                'users' => $usersWithPermissions,
-                'permissions' => $permissions,
-            ], 200);
+            // User::with('roles')->get();
+            return successResponse(
+                $users,
+            );
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Failed to retrieve users',
-                'error' => $e->getMessage(),
-            ], 500);
+            return failureResponse(
+                $e->getMessage(),
+            );
         }
     }
-    protected function updateUser(Request $request)
-    {
+    protected function updateUser(
+        Request $request,
+    ) {
         if (!$request->has('id')) {
             return response()->json([
                 'status' => false,

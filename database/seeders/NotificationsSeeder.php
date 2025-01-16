@@ -10,25 +10,17 @@ use App\Models\Notification;
 class NotificationsSeeder extends Seeder
 {
     public function run(): void
-    {   
-        $types = ['public', 'public'];
-        $userIds = range(1, 5); 
+    {
         $notifications = [];
-
-        for ($i = 0; $i < 10; $i++) {
-            $randomUserIds = array_rand(array_flip($userIds), rand(1, count($userIds)));
-            if (!is_array($randomUserIds)) {
-                $randomUserIds = [$randomUserIds];
-            }
+        for ($i = 1; $i < 10; $i++) {
             $notifications[] = [
-                'type' => $types[array_rand($types)],
-                'notifiable_id' => json_encode($randomUserIds),
-                'message' => 'This is notification number ' . ($i + 1),
+                'message' => 'This is notification number ' . $i,
+                'store_id' => rand(1, 15),
+                'image' => 'https://api.awfar-offers.com/storage/offer.jpg',
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
         }
-
         DB::table('notifications')->insert($notifications);
     }
 }

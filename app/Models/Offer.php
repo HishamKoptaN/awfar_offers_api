@@ -8,36 +8,66 @@ use Carbon\Carbon;
 
 class Offer extends Model
 {
+
     use HasFactory;
+
     protected $fillable = [
-        "name",
         "status",
         "store_id",
-        "category_id",
-        "description",
+        "offer_group_id",
         "image",
-        "end_at"
     ];
-    public function getDaysRemainingAttribute()
+    protected $casts = [
+        'status' => 'boolean',
+    ];
+    public function offerGroup()
     {
-        $endDate = Carbon::parse($this->end_at);
-        $today = Carbon::today();
-        return $endDate->isFuture() ? $today->diffInDays($endDate) : 0;
+        return $this->belongsTo(
+            OfferGroup::class,
+        );
     }
-    public function store()
-    {
-        return $this->belongsTo(Store::class);
+    public function getStatusAttribute(
+        $value,
+    ) {
+        return (bool) $value;
     }
-    public function scopeByGovernorateId($query, $governorateId)
-    {
+    public function scopeByCityId(
+        $query,
+        $cityId,
+    ) {
         return $query->whereHas(
             'store',
-            function ($query) use ($governorateId) {
+            function ($query) use ($cityId) {
                 $query->where(
-                    'governorate_id',
-                    $governorateId,
+                    'city_id',
+                    $cityId,
                 );
             },
         );
+    }
+    public function subCategory()
+    {
+        return $this->belongsTo(
+            SubCategory::class,
+        );
+    }
+
+    public function getOfferDetails()
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'image' => $this->image,
+            'sub_category' => $this->subCategory ? [
+                'id' => $this->subCategory->id,
+                'category_id' => $this->subCategory->category_id,
+            ] : null,
+            'store' => $this->store ? [
+                'id' => $this->store->id,
+                'name' => $this->store->name,
+                'image' => $this->store->image,
+                'offers_count' => $this->store->storeOffersCount()
+            ] : null,
+        ];
     }
 }

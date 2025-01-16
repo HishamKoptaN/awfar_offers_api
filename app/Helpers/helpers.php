@@ -1,41 +1,72 @@
 <?php
 
-use App\Models\Setting;
-use App\Models\User;
-use Illuminate\Support\Facades\Storage;
-use Inertia\Inertia;
-
-function irender($component, $props = [])
-{
-    return Inertia::render($component, $props);
+if (!function_exists('uploadImage')) {
+    /**
+     * To upload image to the specified directory and return the image URL.
+     *
+     * @param \Illuminate\Http\UploadedFile $image
+     * @param string $directory
+     * @return string
+     */
+    function uploadImage(
+        $image,
+        $directory,
+    ) {
+        $imageName = time() . '.' . $image->getClientOriginalExtension();
+        $image->move(
+            public_path('storage/' . $directory),
+            $imageName,
+        );
+        return asset(
+            'storage/' . $directory . '/' . $imageName,
+        );
+    }
 }
-
-function getSetting($name, $default = null)
-{
-    $setting = Setting::where('name', $name)->first();
-
-    if ($setting)
-        return $setting->content;
-
-    return $default;
-}
-
-function storage_url($path)
-{
-    return Storage::url($path);
-}
-
-function storage_exists($path)
-{
-    return Storage::fileExists('public/' . $path);
-}
-
-function user(): User
-{
-    return auth()->user();
-}
-
-function id()
-{
-    return user()->id;
+if (!function_exists('updateImage')) {
+    /**
+     * Update an existing image by replacing it with a new one in the specified directory.
+     * Deletes the old image if it exists, only after the new image is uploaded successfully.
+     *
+     * @param \Illuminate\Http\UploadedFile $newImage
+     * @param string $directory
+     * @param string|null $oldImagePath
+     * @return string|null
+     */
+    function updateImage(
+        $newImage,
+        $directory,
+        $oldImagePath = null,
+    ) {
+        $imageName = time() . '.' . $newImage->getClientOriginalExtension();
+        $newImagePath = public_path(
+            'storage/' . $directory . '/' . $imageName,
+        );
+        if ($newImage->move(
+            public_path('storage/' . $directory),
+            $imageName,
+        )) {
+            if ($oldImagePath) {
+                $oldImageName = basename(
+                    parse_url(
+                        $oldImagePath,
+                        PHP_URL_PATH,
+                    ),
+                );
+                $oldImagePath = public_path(
+                    'storage/' . $directory . '/' . $oldImageName,
+                );
+                if (file_exists(
+                    $oldImagePath,
+                )) {
+                    unlink(
+                        $oldImagePath,
+                    );
+                }
+            }
+            return asset(
+                'storage/' . $directory . '/' . $imageName,
+            );
+        }
+        return null;
+    }
 }
